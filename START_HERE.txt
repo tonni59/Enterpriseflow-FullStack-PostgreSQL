@@ -1,0 +1,25 @@
+ENTERPRISEFLOW QUICK START
+
+1) Install PostgreSQL and create database: enterpriseflow
+2) Terminal 1:
+   cd backend
+   npm install
+   copy .env.example .env  (Windows) / cp .env.example .env (Mac/Linux)
+   Edit DATABASE_URL and JWT_SECRET in .env
+   npx prisma generate
+   npx prisma migrate dev --name init
+   npm run seed
+   npm run dev
+
+3) Terminal 2:
+   cd frontend
+   npm install
+   copy .env.local.example .env.local (Windows) / cp .env.local.example .env.local (Mac/Linux)
+   npm run dev
+
+4) Open http://localhost:3000
+
+Demo admin: admin@enterpriseflow.dev / Admin123!
+Demo customer: customer@enterpriseflow.dev / Customer123!
+
+Full documentation: README.md
