@@ -1,10 +1,12 @@
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -21,16 +23,17 @@ enum OrderStatus {
 }
 
 model User {
-  id           String      @id @default(cuid())
-  name         String
-  email        String      @unique
-  password     String
-  role         Role        @default(CUSTOMER)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  cartItems    CartItem[]
-  orders       Order[]
-  addresses    Address[]
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(CUSTOMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cartItems CartItem[]
+  orders    Order[]
+  addresses Address[]
 }
 
 model Category {
@@ -42,43 +45,50 @@ model Category {
 }
 
 model Product {
-  id          String         @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String
-  price       Decimal        @db.Decimal(10, 2)
-  stock       Int            @default(0)
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
   imageUrl    String?
-  active      Boolean        @default(true)
+  active      Boolean  @default(true)
   categoryId  String
-  category    Category       @relation(fields: [categoryId], references: [id])
-  cartItems   CartItem[]
-  orderItems  OrderItem[]
-  inventory   InventoryLog[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  inventory  InventoryLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([categoryId])
   @@index([name])
 }
 
 model CartItem {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   userId    String
   productId String
-  quantity  Int      @default(1)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int     @default(1)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
   @@unique([userId, productId])
 }
 
 model Order {
-  id              String       @id @default(cuid())
+  id              String      @id @default(cuid())
   userId          String
-  total           Decimal      @db.Decimal(10, 2)
-  status          OrderStatus  @default(PENDING)
+  total           Decimal     @db.Decimal(10, 2)
+  status          OrderStatus @default(PENDING)
   shippingAddress String
-  createdAt       DateTime     @default(now())
-  user            User         @relation(fields: [userId], references: [id])
-  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+
   @@index([userId, createdAt])
 }
 
@@ -88,8 +98,9 @@ model OrderItem {
   productId String
   quantity  Int
   unitPrice Decimal @db.Decimal(10, 2)
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id])
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
 }
 
 model Address {
@@ -98,7 +109,8 @@ model Address {
   label     String   @default("Home")
   address   String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model InventoryLog {
@@ -107,6 +119,8 @@ model InventoryLog {
   change    Int
   reason    String
   createdAt DateTime @default(now())
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
   @@index([productId, createdAt])
 }
